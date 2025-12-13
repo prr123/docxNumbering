@@ -1,3 +1,5 @@
+// fix numb error
+
 package godocxNumLib
 
 import (
@@ -10,13 +12,18 @@ import (
 type numbering struct {
     XMLName xml.Name `xml:"numbering"`
     List []list  `xml:"abstractNum"`
-    Numb numb `xml:"num"`
+    Numb []numb `xml:"num"`
 }
 
 type numb struct {
     XMLName xml.Name `xml:"num"`
     NumId int `xml:"numId,attr"`
-    AbstNumId int `xml:"abstractNumId,attr"`
+    AbstNumId abstNum `xml:"abstractNumId"`
+}
+
+type abstNum struct {
+    XMLName xml.Name `xml:"abstractNumId"`
+    Val int `xml:"val,attr"`
 }
 
 type list struct {
@@ -110,9 +117,10 @@ func PrintNumObj (num *numbering) {
         }
     }
 
-    nb := num.Numb
     fmt.Println("*** Num ****")
-    fmt.Printf("  Name: %s Id: %d Abst Id: %d\n",nb.XMLName.Local, nb.NumId, nb.AbstNumId)
-//  fmt.Printf("Num Id: %d\n", nb.NumId)
-//  fmt.Printf("Abst Num: Id: %d\n", nb.AbstNumId)
+
+    for inum:=0; inum<len(num.Numb); inum++ {
+	    nb := num.Numb[inum]
+		fmt.Printf("  Numb: %d Id: %d Abst Id: %d\n",inum, nb.NumId, nb.AbstNumId.Val)
+	}
 }
