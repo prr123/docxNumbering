@@ -9,10 +9,22 @@ import (
     "github.com/gomutex/godocx/docx"
 )
 
+type DocxLists struct {
+	DLists []DocxList
+}
+
+type DocxList struct {
+	Ord bool
+	AbId int
+	Mark [9]string
+	Start [9]int
+}
+
 type numbering struct {
     XMLName xml.Name `xml:"numbering"`
     List []list  `xml:"abstractNum"`
     Numb []numb `xml:"num"`
+	NMap map[int]int
 }
 
 type numb struct {
@@ -53,7 +65,7 @@ type level struct {
 
 type start struct {
     XMLName xml.Name `xml:"start"`
-    Val string `xml:"val,attr"`
+    Val int `xml:"val,attr"`
 }
 
 type numFmt struct {
@@ -79,10 +91,20 @@ func GetNumObj(rdoc *docx.RootDoc)(numObj *numbering, err error) {
     err = xml.Unmarshal(contNumbering.([]byte), &numObj)
     if err != nil {return nil, fmt.Errorf("unmarshal: %v\n", err)}
 
+	nlen :=len(numObj.Numb)
+	nMap := make(map[int]int)
+    for inum:=0; inum<nlen; inum++ {
+        nb := numObj.Numb[inum]
+		nMap[nb.AbstNumId.Val] = nb.NumId
+//        fmt.Printf("  Numb: %d Id: %d Abst Id: %d\n",inum, nb.NumId, nb.AbstNumId.Val)
+    }
+
+	numObj.NMap = nMap
+
 	return numObj, nil
 }
 
-func PrintNumObj (num *numbering) {
+func (num *numbering)PrintNumObj () {
 
     fmt.Println("*** numbering ****")
     fmt.Printf("Name: %s\n",num.XMLName.Local)
@@ -111,9 +133,9 @@ func PrintNumObj (num *numbering) {
             fmt.Printf("    *** level %d ***\n", i)
             fmt.Printf("      Name: %s Ilvl: %s\n",level.XMLName.Local, level.Ilvl)
 //      fmt.Printf("  ilevel: %s\n", level.Ilvl)
-            fmt.Printf("      start name: %s val: %s\n", level.Start.XMLName.Local, level.Start.Val)
+            fmt.Printf("      start name: %s val: %d\n", level.Start.XMLName.Local, level.Start.Val)
             fmt.Printf("      numFmt name: %s val: %s\n", level.NumFmt.XMLName.Local, level.NumFmt.Val)
-            fmt.Printf("      lvlTxt name: %s val: %s\n", level.LvlText.XMLName.Local, level.LvlText.Val)
+            fmt.Printf("      lvlTxt name: %s val: %v\n", level.LvlText.XMLName.Local, level.LvlText.Val)
         }
     }
 
@@ -122,5 +144,56 @@ func PrintNumObj (num *numbering) {
     for inum:=0; inum<len(num.Numb); inum++ {
 	    nb := num.Numb[inum]
 		fmt.Printf("  Numb: %d Id: %d Abst Id: %d\n",inum, nb.NumId, nb.AbstNumId.Val)
+	}
+
+	fmt.Println("*** end of PrintList ***")
+}
+
+func (num *numbering) CreNList() (ML DocxLists, err error) {
+
+	fmt.Println("*** CreNList ***")
+    for _, child := range num.List {
+        fmt.Printf("abs Num: %d\n",child.AbstNumId)
+    }
+
+
+	fmt.Printf("lists: %d\n", len(num.List))
+
+	ML.DLists = make([]DocxList, len(num.List))
+
+	for i:=0; i<  len(num.List); i++ {
+		an := num.List[i].AbstNumId
+		nm:= num.NMap[an]-1
+		fmt.Printf("num: %d abs num: %d\n", nm, an)
+		dl := ML.DLists[nm]
+		dl.AbId = an
+		dl.Ord = true
+		if num.List[i].Lvl[0].NumFmt.Val == "Bullet" {dl.Ord = false}
+
+		for il:=0; il<9; il++ {
+			ML.DLists[nm].Mark[il] = num.List[i].Lvl[il].NumFmt.Val
+			ML.DLists[nm].Start[il] = num.List[i].Lvl[il].Start.Val
+		}
+	}
+
+    return ML, nil
+}
+
+func (DL DocxLists) PrintDocxList() {
+
+	fmt.Printf("**** DocxLists: %d ****\n", len(DL.DLists))
+
+	for i:=0; i< len(DL.DLists); i++ {
+		dl := DL.DLists[i]
+		fmt.Printf("  *** DL: %d ***\n",i)
+		fmt.Printf("   order: %t\n", dl.Ord)
+		fmt.Printf("   Abs Id: %d\n", dl.AbId)
+
+		for il:=0; il< 9; il++ {
+			fmt.Printf("    level: %d\n", il)
+			fmt.Printf("      mark:  %s\n", dl.Mark[il])
+			fmt.Printf("      start: %d\n", dl.Start[il])
+
+		}
 	}
 }
