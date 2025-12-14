@@ -95,7 +95,7 @@ func GetNumObj(rdoc *docx.RootDoc)(numObj *numbering, err error) {
 	nMap := make(map[int]int)
     for inum:=0; inum<nlen; inum++ {
         nb := numObj.Numb[inum]
-		nMap[nb.AbstNumId.Val] = nb.Numid -1
+		nMap[nb.AbstNumId.Val] = nb.NumId -1
 //        fmt.Printf("  Numb: %d Id: %d Abst Id: %d\n",inum, nb.NumId, nb.AbstNumId.Val)
     }
 
@@ -108,6 +108,8 @@ func (num *numbering)PrintNumObj () {
 
     fmt.Println("*** numbering ****")
     fmt.Printf("Name: %s\n",num.XMLName.Local)
+
+
 
     fmt.Println("*** List ****")
 
@@ -141,9 +143,8 @@ func (num *numbering)PrintNumObj () {
 
     fmt.Println("*** Num ****")
 
-    for inum:=0; inum<len(num.Numb); inum++ {
-	    nb := num.Numb[inum]
-		fmt.Printf("  Numb: %d Id: %d Abst Id: %d\n",inum, nb.NumId, nb.AbstNumId.Val)
+	for abs, nm := range num.NMap {
+		fmt.Printf(" abs: %d numid: %d\n", abs, nm)
 	}
 
 	fmt.Println("*** end of PrintList ***")
@@ -158,16 +159,19 @@ func (num *numbering) CreNList() (ML DocxLists, err error) {
 	for i:=0; i<  len(num.List); i++ {
 		an := num.List[i].AbstNumId
 		nm:= num.NMap[an]
-//		fmt.Printf("num: %d abs num: %d\n", nm, an)
-		dl := ML.DLists[nm]
+//		fmt.Printf("%d: abs num: %d num: %d\n", i, an, nm)
+		dl:=ML.DLists[nm]
 		dl.AbId = an
 		dl.Ord = true
+//	fmt.Printf("ord: %t, abnum: %d\n", dl.Ord, dl.AbId)
 		if num.List[i].Lvl[0].NumFmt.Val == "Bullet" {dl.Ord = false}
-
+		fmt.Printf(" numFmt: %s\n", num.List[i].Lvl[0].NumFmt.Val)
 		for il:=0; il<9; il++ {
-			ML.DLists[nm].Mark[il] = num.List[i].Lvl[il].NumFmt.Val
-			ML.DLists[nm].Start[il] = num.List[i].Lvl[il].Start.Val
+			dl.Mark[il] = num.List[i].Lvl[il].NumFmt.Val
+			dl.Start[il] = num.List[i].Lvl[il].Start.Val
 		}
+		ML.DLists[nm] = dl
+//	fmt.Printf("ord: %t, abnum: %d\n", dl.Ord, dl.AbId)
 	}
 
     return ML, nil
