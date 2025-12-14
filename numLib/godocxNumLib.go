@@ -95,7 +95,7 @@ func GetNumObj(rdoc *docx.RootDoc)(numObj *numbering, err error) {
 	nMap := make(map[int]int)
     for inum:=0; inum<nlen; inum++ {
         nb := numObj.Numb[inum]
-		nMap[nb.AbstNumId.Val] = nb.NumId
+		nMap[nb.AbstNumId.Val] = nb.Numid -1
 //        fmt.Printf("  Numb: %d Id: %d Abst Id: %d\n",inum, nb.NumId, nb.AbstNumId.Val)
     }
 
@@ -151,19 +151,13 @@ func (num *numbering)PrintNumObj () {
 
 func (num *numbering) CreNList() (ML DocxLists, err error) {
 
-	fmt.Println("*** CreNList ***")
-    for _, child := range num.List {
-        fmt.Printf("abs Num: %d\n",child.AbstNumId)
-    }
-
-
-	fmt.Printf("lists: %d\n", len(num.List))
+//	fmt.Printf("lists: %d\n", len(num.List))
 
 	ML.DLists = make([]DocxList, len(num.List))
 
 	for i:=0; i<  len(num.List); i++ {
 		an := num.List[i].AbstNumId
-		nm:= num.NMap[an]+1
+		nm:= num.NMap[an]
 //		fmt.Printf("num: %d abs num: %d\n", nm, an)
 		dl := ML.DLists[nm]
 		dl.AbId = an
