@@ -163,8 +163,8 @@ func (num *numbering) CreNList() (ML DocxLists, err error) {
 
 	for i:=0; i<  len(num.List); i++ {
 		an := num.List[i].AbstNumId
-		nm:= num.NMap[an]-1
-		fmt.Printf("num: %d abs num: %d\n", nm, an)
+		nm:= num.NMap[an]+1
+//		fmt.Printf("num: %d abs num: %d\n", nm, an)
 		dl := ML.DLists[nm]
 		dl.AbId = an
 		dl.Ord = true
