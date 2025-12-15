@@ -166,7 +166,7 @@ func (num *numbering) CreNList() (ML DocxLists, err error) {
 		dl.Ord = true
 //	fmt.Printf("ord: %t, abnum: %d\n", dl.Ord, dl.AbId)
 		if num.List[an].Lvl[0].NumFmt.Val == "bullet" {dl.Ord = false}
-		fmt.Printf(" numFmt: %s\n", num.List[ni-1].Lvl[0].NumFmt.Val)
+//		fmt.Printf(" numFmt: %s\n", num.List[ni-1].Lvl[0].NumFmt.Val)
 		for il:=0; il<9; il++ {
 			dl.Mark[il] = num.List[an].Lvl[il].NumFmt.Val
 			dl.Start[il] = num.List[an].Lvl[il].Start.Val
