@@ -95,7 +95,8 @@ func GetNumObj(rdoc *docx.RootDoc)(numObj *numbering, err error) {
 	nMap := make(map[int]int)
     for inum:=0; inum<nlen; inum++ {
         nb := numObj.Numb[inum]
-		nMap[nb.AbstNumId.Val] = nb.NumId -1
+//		nMap[nb.AbstNumId.Val] = nb.NumId -1
+		nMap[nb.NumId -1] = nb.AbstNumId.Val
 //        fmt.Printf("  Numb: %d Id: %d Abst Id: %d\n",inum, nb.NumId, nb.AbstNumId.Val)
     }
 
@@ -104,7 +105,7 @@ func GetNumObj(rdoc *docx.RootDoc)(numObj *numbering, err error) {
 	return numObj, nil
 }
 
-func (num *numbering)PrintNumObj () {
+func (num *numbering)PrintNumObj() {
 
     fmt.Println("*** numbering ****")
     fmt.Printf("Name: %s\n",num.XMLName.Local)
@@ -156,21 +157,21 @@ func (num *numbering) CreNList() (ML DocxLists, err error) {
 
 	ML.DLists = make([]DocxList, len(num.List))
 
-	for i:=0; i<  len(num.List); i++ {
-		an := num.List[i].AbstNumId
-		nm:= num.NMap[an]
-//		fmt.Printf("%d: abs num: %d num: %d\n", i, an, nm)
-		dl:=ML.DLists[nm]
-		dl.AbId = an
+	for ni:=1; ni<  len(num.List)+1; ni++ {
+		an:= num.NMap[ni-1]
+		an1 := num.List[an].AbstNumId
+		fmt.Printf("%d: abs num: %d %d num: %d\n", ni, an, an1, ni)
+		dl:=ML.DLists[ni-1]
+		dl.AbId = an1
 		dl.Ord = true
 //	fmt.Printf("ord: %t, abnum: %d\n", dl.Ord, dl.AbId)
-		if num.List[i].Lvl[0].NumFmt.Val == "Bullet" {dl.Ord = false}
-		fmt.Printf(" numFmt: %s\n", num.List[i].Lvl[0].NumFmt.Val)
+		if num.List[an].Lvl[0].NumFmt.Val == "Bullet" {dl.Ord = false}
+		fmt.Printf(" numFmt: %s\n", num.List[ni-1].Lvl[0].NumFmt.Val)
 		for il:=0; il<9; il++ {
-			dl.Mark[il] = num.List[i].Lvl[il].NumFmt.Val
-			dl.Start[il] = num.List[i].Lvl[il].Start.Val
+			dl.Mark[il] = num.List[an].Lvl[il].NumFmt.Val
+			dl.Start[il] = num.List[an].Lvl[il].Start.Val
 		}
-		ML.DLists[nm] = dl
+		ML.DLists[ni-1] = dl
 //	fmt.Printf("ord: %t, abnum: %d\n", dl.Ord, dl.AbId)
 	}
 
@@ -183,7 +184,7 @@ func (DL DocxLists) PrintDocxList() {
 
 	for i:=0; i< len(DL.DLists); i++ {
 		dl := DL.DLists[i]
-		fmt.Printf("  *** DL: %d ***\n",i)
+		fmt.Printf("  *** DL: %d ***\n",i+1)
 		fmt.Printf("   order: %t\n", dl.Ord)
 		fmt.Printf("   Abs Id: %d\n", dl.AbId)
 
