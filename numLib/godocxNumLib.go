@@ -160,12 +160,12 @@ func (num *numbering) CreNList() (ML DocxLists, err error) {
 	for ni:=1; ni<  len(num.List)+1; ni++ {
 		an:= num.NMap[ni-1]
 		an1 := num.List[an].AbstNumId
-//		fmt.Printf("%d: abs num: %d %d num: %d\n", ni, an, an1, ni)
+//	fmt.Printf("%d: abs num: %d %d num: %d\n", ni, an, an1, ni)
 		dl:=ML.DLists[ni-1]
 		dl.AbId = an1
 		dl.Ord = true
 //	fmt.Printf("ord: %t, abnum: %d\n", dl.Ord, dl.AbId)
-		if num.List[ni-1].Lvl[0].NumFmt.Val == "Bullet" {dl.Ord = false}
+		if num.List[an].Lvl[0].NumFmt.Val == "bullet" {dl.Ord = false}
 		fmt.Printf(" numFmt: %s\n", num.List[ni-1].Lvl[0].NumFmt.Val)
 		for il:=0; il<9; il++ {
 			dl.Mark[il] = num.List[an].Lvl[il].NumFmt.Val
