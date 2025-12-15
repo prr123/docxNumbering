@@ -151,7 +151,7 @@ func (num *numbering)PrintNumObj() {
 	fmt.Println("*** end of PrintList ***")
 }
 
-func (num *numbering) CreNList() (ML DocxLists, err error) {
+func (num *numbering) CreNList() (ML *DocxLists, err error) {
 
 //	fmt.Printf("lists: %d\n", len(num.List))
 
@@ -179,7 +179,7 @@ func (num *numbering) CreNList() (ML DocxLists, err error) {
     return ML, nil
 }
 
-func (DL DocxLists) PrintDocxList() {
+func (DL *DocxLists) PrintDocxList() {
 
 	fmt.Printf("**** DocxLists: %d ****\n", len(DL.DLists))
 
