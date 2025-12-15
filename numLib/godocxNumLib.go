@@ -155,6 +155,7 @@ func (num *numbering) CreNList() (ML DocxLists, err error) {
 
 //	fmt.Printf("lists: %d\n", len(num.List))
 
+	if num == nil {return nil, fmt.Errorf("num is nil!")}
 	ML.DLists = make([]DocxList, len(num.List))
 
 	for ni:=1; ni<  len(num.List)+1; ni++ {
