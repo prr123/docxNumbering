@@ -76,9 +76,9 @@ func main() {
 
 	numObj.PrintNumObj()
 
-	MD, err := numObj.CreNList()
+	ML, err := numObj.CreNList()
 	if err != nil { log.Fatalf("error -- CreNList: %v\n", err)}
 
-	MD.PrintDocxList()
+	ML.PrintDocxList()
 }
 
